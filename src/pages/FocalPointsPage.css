@@ -1,0 +1,274 @@
+/* ── Page shell ─────────────────────────────────── */
+.fp-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--sz-font-display);
+}
+
+/* ── Full dark canvas ────────────────────────────── */
+.fp-canvas {
+    flex: 1;
+    background: var(--sz-black);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 5rem 2rem 2rem;
+}
+
+/* Grid overlay */
+.fp-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+}
+
+/* Ghost watermark */
+.fp-watermark {
+    font-family: var(--sz-font-display);
+    font-weight: 900;
+    font-size: clamp(180px, 30vw, 420px);
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+    color: rgba(255, 255, 255, 0.04);
+    position: absolute;
+    bottom: -0.1em;
+    right: -0.04em;
+    user-select: none;
+    pointer-events: none;
+}
+
+/* ── Step label ──────────────────────────────────── */
+.fp-corner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 1.1rem 2rem;
+    border-right: 1px solid #1c1c1c;
+    border-bottom: 1px solid #1c1c1c;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+}
+
+.fp-corner-num {
+    font-size: 2.25rem;
+    font-weight: 900;
+    color: var(--sz-red);
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.fp-corner-label {
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #333;
+}
+
+/* ── Content column ──────────────────────────────── */
+.fp-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    animation: d5-reveal 0.4s ease both;
+}
+
+/* ── Nav bar ─────────────────────────────────────── */
+.fp-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #1c1c1c;
+    padding: 0.75rem 1.25rem;
+    gap: 1rem;
+}
+
+.fp-nav-btn {
+    background: transparent;
+    border: none;
+    color: #555;
+    font-family: var(--sz-font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    transition: color 0.15s ease;
+    white-space: nowrap;
+}
+
+.fp-nav-btn:hover:not(:disabled) {
+    color: var(--sz-white);
+}
+
+.fp-nav-btn:disabled {
+    color: #222;
+    cursor: not-allowed;
+}
+
+.fp-nav-center {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    flex: 1;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.fp-nav-name {
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: var(--sz-white);
+}
+
+.fp-nav-dim {
+    font-size: 0.8rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    color: #555;
+}
+
+.fp-nav-count {
+    font-size: 0.8rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    color: #333;
+}
+
+/* ── Progress strip ──────────────────────────────── */
+.fp-progress {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.fp-progress-sq {
+    width: 24px;
+    height: 24px;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.fp-progress-sq:hover {
+    border-color: #444;
+}
+
+.fp-progress-sq--confirmed {
+    background: var(--sz-red);
+    border-color: var(--sz-red);
+}
+
+.fp-progress-sq--active {
+    border-color: var(--sz-white);
+}
+
+.fp-progress-sq--confirmed.fp-progress-sq--active {
+    border-color: var(--sz-white);
+}
+
+/* ── Submit button ───────────────────────────────── */
+.fp-submit {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: var(--sz-red);
+    color: var(--sz-white);
+    font-family: var(--sz-font-display);
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.fp-submit:hover:not(:disabled) {
+    background: #ff2200;
+}
+
+.fp-submit:disabled {
+    background: #111;
+    color: #2a2a2a;
+    cursor: not-allowed;
+}
+
+/* ── Done state ──────────────────────────────────── */
+.fp-done {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    animation: d5-reveal 0.4s ease both;
+}
+
+.fp-done-check {
+    font-size: 3.5rem;
+    color: var(--sz-red);
+    font-weight: 900;
+    line-height: 1;
+}
+
+.fp-done-label {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--sz-white);
+    line-height: 1;
+}
+
+/* ── Error ───────────────────────────────────────── */
+.fp-error {
+    font-size: 0.8rem;
+    color: var(--sz-red);
+    letter-spacing: 0.08em;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 600px) {
+    .fp-canvas {
+        padding: 4rem 1rem 1.5rem;
+    }
+
+    .fp-corner {
+        padding: 0.85rem 1.25rem;
+    }
+
+    .fp-corner-num {
+        font-size: 1.75rem;
+    }
+
+    .fp-nav {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .fp-progress-sq {
+        width: 18px;
+        height: 18px;
+    }
+}

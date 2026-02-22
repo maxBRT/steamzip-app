@@ -1,0 +1,31 @@
+.ic-container {
+    position: relative;
+    width: 100%;
+    max-height: 55vh;
+    background: #111;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.ic-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-height: 55vh;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
+}
+
+.ic-rect {
+    position: absolute;
+    border: 2px solid var(--sz-red);
+    background: rgba(227, 27, 0, 0.15);
+    cursor: grab;
+    touch-action: none;
+    box-sizing: border-box;
+}
+
+.ic-rect:active {
+    cursor: grabbing;
+}

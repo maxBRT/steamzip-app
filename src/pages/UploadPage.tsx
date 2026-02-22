@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { SiteHeader } from '../components/sections/SiteHeader';
 import { DropZone } from '../components/ui/DropZone';
 import { useSession } from '../hooks/useSession';
@@ -9,12 +10,18 @@ export default function UploadPage(): React.ReactElement {
     const session = useSession();
     const { upload, status: uploadStatus, error: uploadError } = useFileUpload(session.sessionId);
     const [file, setFile] = useState<File | null>(null);
+    const navigate = useNavigate();
 
     const isLoading   = session.status === 'loading';
     const isUploading = uploadStatus === 'uploading';
-    const isDone      = uploadStatus === 'done';
     const isError     = session.status === 'error' || uploadStatus === 'error';
     const error       = session.error || uploadError;
+
+    useEffect(() => {
+        if (uploadStatus === 'done') {
+            navigate('/focal-points');
+        }
+    }, [uploadStatus, navigate]);
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
         e.preventDefault();
@@ -34,13 +41,6 @@ export default function UploadPage(): React.ReactElement {
                     <span className="up-corner-label">Master Image</span>
                 </div>
 
-                {isDone && (
-                    <div className="up-done">
-                        <div className="up-done-check">✓</div>
-                        <div className="up-done-label">Received.</div>
-                    </div>
-                )}
-
                 {isError && (
                     <div className="up-error">
                         <div className="up-error-label">Error</div>
@@ -49,7 +49,7 @@ export default function UploadPage(): React.ReactElement {
                     </div>
                 )}
 
-                {!isDone && !isError && (
+                {!isError && (
                     <form
                         className={`up-form${isLoading ? ' up-form--init' : ''}`}
                         onSubmit={handleSubmit}

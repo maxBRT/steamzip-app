@@ -7,6 +7,7 @@ Bun.serve({
     routes: {
         "/": index,
         "/upload": index,
+        "/focal-points": index,
         "/api/*": (req) => {
             const url = new URL(req.url);
             return fetch(`${API_ORIGIN}${url.pathname}${url.search}`, {

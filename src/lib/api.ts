@@ -9,10 +9,18 @@ export interface GetUploadUrlResponse {
     uploadUrl: string;
 }
 
+export interface GetMasterImageUrlResponse {
+    url: string;
+}
+
+export type FocalPointsPayload = Record<string, { x: number; y: number }>;
+
 interface Api {
     createSession: () => Promise<CreateSessionResponse>;
     getUploadUrl: (sessionId: string, contentType: string) => Promise<GetUploadUrlResponse>;
     confirmUpload: (sessionId: string) => Promise<void>;
+    getMasterImageUrl: (sessionId: string) => Promise<GetMasterImageUrlResponse>;
+    submitFocalPoints: (sessionId: string, points: FocalPointsPayload) => Promise<void>;
 }
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
@@ -34,4 +42,11 @@ export const api: Api = {
         ),
     confirmUpload: (sessionId: string) =>
         apiFetch<void>(`/api/sessions/${sessionId}/assets/confirm-upload`, { method: 'POST' }),
+    getMasterImageUrl: (sessionId: string) =>
+        apiFetch<GetMasterImageUrlResponse>(`/api/sessions/${sessionId}/assets/master`),
+    submitFocalPoints: (sessionId: string, points: FocalPointsPayload) =>
+        apiFetch<void>(`/api/sessions/${sessionId}/assets/process`, {
+            method: 'POST',
+            body: JSON.stringify({ focalPoints: points }),
+        }),
 };
