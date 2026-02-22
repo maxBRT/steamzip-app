@@ -5,8 +5,9 @@ import './FeaturesGrid.css';
 const FEATURES: { num: string; title: string; desc: ReactNode }[] = [
     { num: "01", title: "Upload Master Art", desc: <><strong>3840×2160</strong> One file powers every size and ratio.</> },
     { num: "02", title: "Set Focal Point", desc: <>Pin the subject. Every crop stays <strong>perfectly composed</strong>.</> },
-    { num: "03", title: "Download Pack", desc: <>A ZIP with all the assets, <strong>ready to upload on Steam.</strong></> },
-    { num: "Free", title: "Preview First", desc: <>The <strong>Header Capsule</strong> is always free. Try it before you buy.</> },
+    { num: "03", title: "Preview First", desc: <>Preview <strong>everything</strong> it's free. Try it before you buy.</> },
+    { num: "04", title: "Download Pack", desc: <>A ZIP with all the assets, <strong>ready to upload on Steam.</strong></> },
+
 ];
 
 export function FeaturesGrid() {
