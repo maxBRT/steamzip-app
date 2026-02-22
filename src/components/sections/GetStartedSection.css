@@ -1,0 +1,74 @@
+.gs-panel {
+    padding: 2rem 3rem;
+    background: var(--sz-black);
+    position: relative;
+    animation: d5-reveal 0.4s 0.2s ease both;
+    display: flex;
+    align-items: center;
+}
+
+.gs-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+}
+
+.gs-heading {
+    font-family: var(--sz-font-display);
+    font-weight: 800;
+    font-size: 2rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--sz-white);
+    line-height: 1.1;
+}
+
+.gs-sub {
+    font-family: var(--sz-font-display);
+    font-size: 1rem;
+    font-weight: 400;
+    color: #888;
+    line-height: 1.5;
+    letter-spacing: 0.03em;
+}
+
+.gs-btn {
+    display: block;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: var(--sz-red);
+    color: var(--sz-white);
+    font-family: var(--sz-font-display);
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+}
+
+.gs-btn:hover {
+    opacity: 0.88;
+}
+
+.gs-note {
+    font-family: var(--sz-font-display);
+    font-size: 0.8rem;
+    color: #555;
+    letter-spacing: 0.05em;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .gs-panel {
+        padding: 1.5rem;
+    }
+
+    .gs-heading {
+        font-size: 1.6rem;
+    }
+}

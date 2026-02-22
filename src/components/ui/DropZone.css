@@ -1,0 +1,92 @@
+.dz-zone {
+    border: 1.5px solid #2a2a2a;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: #0d0d0d;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.dz-zone:hover {
+    border-color: #444;
+}
+
+.dz-zone--ready {
+    border-color: var(--sz-red);
+    background: rgba(227, 27, 0, 0.04);
+}
+
+.dz-input {
+    display: none;
+}
+
+/* Empty state */
+.dz-prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.dz-prompt-arrow {
+    font-size: 2.5rem;
+    color: #252525;
+    line-height: 1;
+}
+
+.dz-prompt-text {
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #2e2e2e;
+    font-weight: 400;
+}
+
+/* File selected */
+.dz-file {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.dz-file-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--sz-white);
+    letter-spacing: 0.04em;
+    word-break: break-all;
+    font-family: var(--sz-font-display);
+}
+
+.dz-file-meta {
+    font-size: 0.75rem;
+    color: #444;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-family: var(--sz-font-display);
+}
+
+/* Loading spinner */
+.dz-spinner {
+    width: 28px;
+    height: 28px;
+    border: 1.5px solid #1e1e1e;
+    border-top-color: var(--sz-red);
+    border-radius: 50%;
+    animation: dz-spin 0.8s linear infinite;
+}
+
+@keyframes dz-spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 600px) {
+    .dz-zone {
+        height: 220px;
+    }
+}

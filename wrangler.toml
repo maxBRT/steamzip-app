@@ -1,8 +1,0 @@
-name = "steamzip"
-compatibility_date = "2024-09-23"
-pages_build_output_dir = "dist"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "steamzip-waitlist"
-database_id = "a4a288a4-4898-4284-9d9b-dc77848f16f2"
