@@ -12,10 +12,10 @@ export default function UploadPage(): React.ReactElement {
     const [file, setFile] = useState<File | null>(null);
     const navigate = useNavigate();
 
-    const isLoading   = session.status === 'loading';
+    const isLoading = session.status === 'loading';
     const isUploading = uploadStatus === 'uploading';
-    const isError     = session.status === 'error' || uploadStatus === 'error';
-    const error       = session.error || uploadError;
+    const isError = session.status === 'error' || uploadStatus === 'error';
+    const error = session.error || uploadError;
 
     useEffect(() => {
         if (uploadStatus === 'done') {
@@ -23,7 +23,7 @@ export default function UploadPage(): React.ReactElement {
         }
     }, [uploadStatus, navigate]);
 
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
+    function handleSubmit(e: React.SubmitEvent<HTMLFormElement>): void {
         e.preventDefault();
         if (file) upload(file);
     }

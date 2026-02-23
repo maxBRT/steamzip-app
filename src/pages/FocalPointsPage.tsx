@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { SiteHeader } from '../components/sections/SiteHeader';
 import { ImageCropper } from '../components/ui/ImageCropper';
 import { useSession } from '../hooks/useSession';
@@ -11,7 +10,6 @@ import './FocalPointsPage.css';
 export default function FocalPointsPage(): React.ReactElement {
     const session = useSession();
     const fp = useFocalPoints(session.sessionId);
-    const navigate = useNavigate();
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
     useEffect(() => {
@@ -21,15 +19,16 @@ export default function FocalPointsPage(): React.ReactElement {
             .catch(() => { /* image unavailable, cropper stays hidden */ });
     }, [session.sessionId]);
 
-    useEffect(() => {
-        if (fp.submitStatus === 'done') {
-            // Future: navigate to a results page
-        }
-    }, [fp.submitStatus, navigate]);
-
-    function handleConfirmOrSubmit() {
+    async function handleConfirmOrSubmit() {
         if (fp.allConfirmed) {
-            fp.submitAll();
+            if (!session.sessionId) return;
+            fp.setSubmitting();
+            try {
+                const data = await api.createCheckoutSession(session.sessionId, fp.buildPayload());
+                window.location.href = data.checkout_url;
+            } catch (err) {
+                fp.setSubmitError(err instanceof Error ? err.message : 'Failed to create checkout');
+            }
         } else {
             fp.confirm();
             if (fp.assetIndex < STEAM_ASSETS.length - 1) {
@@ -56,7 +55,7 @@ export default function FocalPointsPage(): React.ReactElement {
                 {isDone ? (
                     <div className="fp-done">
                         <div className="fp-done-check">✓</div>
-                        <div className="fp-done-label">Processing.</div>
+                        <div className="fp-done-label">Redirecting to checkout…</div>
                     </div>
                 ) : (
                     <div className="fp-content">
@@ -87,7 +86,9 @@ export default function FocalPointsPage(): React.ReactElement {
                                 imageUrl={imageUrl}
                                 asset={fp.currentAsset}
                                 point={fp.focalPoints[fp.currentAsset.id] ?? { x: 0.5, y: 0.5 }}
+                                zoom={fp.zooms[fp.currentAsset.id] ?? 1}
                                 onChange={fp.setPoint}
+                                onZoomChange={fp.setZoom}
                             />
                         )}
 

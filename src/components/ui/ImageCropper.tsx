@@ -3,14 +3,20 @@ import type { SteamAsset } from '../../lib/assets';
 import type { FocalPoint } from '../../hooks/useFocalPoints';
 import './ImageCropper.css';
 
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 4;
+const ZOOM_STEP = 0.25;
+
 interface ImageCropperProps {
     imageUrl: string;
     asset: SteamAsset;
     point: FocalPoint;
+    zoom: number;
     onChange: (p: FocalPoint) => void;
+    onZoomChange: (z: number) => void;
 }
 
-export function ImageCropper({ imageUrl, asset, point, onChange }: ImageCropperProps) {
+export function ImageCropper({ imageUrl, asset, point, zoom, onChange, onZoomChange }: ImageCropperProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [displaySize, setDisplaySize] = useState({ width: 0, height: 0 });
     const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 });
@@ -30,7 +36,6 @@ export function ImageCropper({ imageUrl, asset, point, onChange }: ImageCropperP
     }, []);
 
     // Compute the letterboxed image rect inside the container.
-    // object-fit: contain scales the image uniformly to fit, adding bars on the short axis.
     const { width: dw, height: dh } = displaySize;
     const { width: nw, height: nh } = naturalSize;
 
@@ -39,13 +44,11 @@ export function ImageCropper({ imageUrl, asset, point, onChange }: ImageCropperP
         const containerAR = dw / dh;
         const imageAR = nw / nh;
         if (imageAR > containerAR) {
-            // Image wider than container slot → fit to width, bars on top/bottom
             imgW = dw;
             imgH = dw / imageAR;
             imgX = 0;
             imgY = (dh - imgH) / 2;
         } else {
-            // Image taller than container slot → fit to height, bars on left/right
             imgH = dh;
             imgW = dh * imageAR;
             imgX = (dw - imgW) / 2;
@@ -53,21 +56,17 @@ export function ImageCropper({ imageUrl, asset, point, onChange }: ImageCropperP
         }
     }
 
-    // Scale factor: display pixels per natural pixel.
     const scale = imgW > 0 ? imgW / nw : 0;
 
-    // Mirror backend CropRect: the crop region on the master is fitted to the target
-    // aspect ratio, constrained by whichever master dimension is the bottleneck.
-    //   masterAR > targetAR → master is wider → crop fits to master HEIGHT
-    //   masterAR ≤ targetAR → master is taller → crop fits to master WIDTH
     const targetAR = asset.width / asset.height;
     const masterAR = nw > 0 && nh > 0 ? nw / nh : 1;
     const cropNatW = masterAR > targetAR ? nh * targetAR : nw;
     const cropNatH = masterAR > targetAR ? nh : nw / targetAR;
-    const rectW = cropNatW * scale;
-    const rectH = cropNatH * scale;
 
-    // Rect top-left in container-space, clamped within the rendered image area.
+    // Zoom shrinks the crop rect — zoom=2 means half the area on each axis.
+    const rectW = (cropNatW * scale) / zoom;
+    const rectH = (cropNatH * scale) / zoom;
+
     const clampedLeft = Math.max(imgX, Math.min(imgX + point.x * imgW - rectW / 2, imgX + imgW - rectW));
     const clampedTop = Math.max(imgY, Math.min(imgY + point.y * imgH - rectH / 2, imgY + imgH - rectH));
 
@@ -87,11 +86,9 @@ export function ImageCropper({ imageUrl, asset, point, onChange }: ImageCropperP
         const pointerX = e.clientX - containerRect.left;
         const pointerY = e.clientY - containerRect.top;
 
-        // Clamp rect top-left within the rendered image area.
         const cl = Math.max(imgX, Math.min(pointerX - dragOffset.current.dx, imgX + imgW - rectW));
         const ct = Math.max(imgY, Math.min(pointerY - dragOffset.current.dy, imgY + imgH - rectH));
 
-        // Normalize center coords relative to the rendered image, matching backend expectations.
         onChange({
             x: (cl - imgX + rectW / 2) / imgW,
             y: (ct - imgY + rectH / 2) / imgH,
@@ -103,10 +100,17 @@ export function ImageCropper({ imageUrl, asset, point, onChange }: ImageCropperP
         dragOffset.current = null;
     }
 
+    function handleWheel(e: React.WheelEvent<HTMLDivElement>) {
+        e.preventDefault();
+        const direction = e.deltaY > 0 ? 1 : -1;
+        const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom + direction * ZOOM_STEP));
+        onZoomChange(Math.round(newZoom / ZOOM_STEP) * ZOOM_STEP);
+    }
+
     const ready = imgW > 0 && rectW > 0;
 
     return (
-        <div className="ic-container" ref={containerRef}>
+        <div className="ic-container" ref={containerRef} onWheel={handleWheel}>
             <img
                 className="ic-image"
                 src={imageUrl}
@@ -126,6 +130,21 @@ export function ImageCropper({ imageUrl, asset, point, onChange }: ImageCropperP
                     onPointerUp={handlePointerUp}
                 />
             )}
+            <div className="ic-zoom">
+                <button
+                    className="ic-zoom-btn"
+                    onClick={() => onZoomChange(Math.max(MIN_ZOOM, zoom - ZOOM_STEP))}
+                    disabled={zoom <= MIN_ZOOM}
+                    aria-label="Zoom out"
+                >−</button>
+                <span className="ic-zoom-label">{zoom.toFixed(2)}×</span>
+                <button
+                    className="ic-zoom-btn"
+                    onClick={() => onZoomChange(Math.min(MAX_ZOOM, zoom + ZOOM_STEP))}
+                    disabled={zoom >= MAX_ZOOM}
+                    aria-label="Zoom in"
+                >+</button>
+            </div>
         </div>
     );
 }

@@ -13,7 +13,18 @@ export interface GetMasterImageUrlResponse {
     url: string;
 }
 
-export type FocalPointsPayload = Record<string, { x: number; y: number }>;
+export type FocalPointsPayload = Record<string, { x: number; y: number; zoom: number }>;
+
+export interface CreateCheckoutResponse {
+    checkout_url: string;
+}
+
+export interface GetSessionStatusResponse {
+    sessionId: string;
+    status: string;
+    assetStatus?: string;
+    downloadUrl?: string;
+}
 
 interface Api {
     createSession: () => Promise<CreateSessionResponse>;
@@ -21,6 +32,8 @@ interface Api {
     confirmUpload: (sessionId: string) => Promise<void>;
     getMasterImageUrl: (sessionId: string) => Promise<GetMasterImageUrlResponse>;
     submitFocalPoints: (sessionId: string, points: FocalPointsPayload) => Promise<void>;
+    createCheckoutSession: (sessionId: string, focalPoints: FocalPointsPayload) => Promise<CreateCheckoutResponse>;
+    getSessionStatus: (sessionId: string) => Promise<GetSessionStatusResponse>;
 }
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
@@ -49,4 +62,11 @@ export const api: Api = {
             method: 'POST',
             body: JSON.stringify({ focalPoints: points }),
         }),
+    createCheckoutSession: (sessionId: string, focalPoints: FocalPointsPayload) =>
+        apiFetch<CreateCheckoutResponse>(`/api/sessions/${sessionId}/checkout`, {
+            method: 'POST',
+            body: JSON.stringify({ focal_points: focalPoints }),
+        }),
+    getSessionStatus: (sessionId: string) =>
+        apiFetch<GetSessionStatusResponse>(`/api/sessions/${sessionId}/status`),
 };

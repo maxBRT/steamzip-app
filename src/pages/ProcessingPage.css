@@ -1,0 +1,166 @@
+/* ── Page shell ─────────────────────────────────── */
+.pp-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--sz-font-display);
+}
+
+/* ── Full dark canvas ────────────────────────────── */
+.pp-canvas {
+    flex: 1;
+    background: var(--sz-black);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 3rem 4rem;
+}
+
+/* Grid overlay */
+.pp-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+}
+
+/* Ghost watermark */
+.pp-watermark {
+    font-family: var(--sz-font-display);
+    font-weight: 900;
+    font-size: clamp(180px, 30vw, 420px);
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+    color: rgba(255, 255, 255, 0.04);
+    position: absolute;
+    bottom: -0.1em;
+    right: -0.04em;
+    user-select: none;
+    pointer-events: none;
+}
+
+/* ── Step label ──────────────────────────────────── */
+.pp-corner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 1.1rem 2rem;
+    border-right: 1px solid #1c1c1c;
+    border-bottom: 1px solid #1c1c1c;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+}
+
+.pp-corner-num {
+    font-size: 2.25rem;
+    font-weight: 900;
+    color: var(--sz-red);
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.pp-corner-label {
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #333;
+}
+
+/* ── Content area ────────────────────────────────── */
+.pp-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    animation: d5-reveal 0.4s ease both;
+}
+
+/* ── Spinner ─────────────────────────────────────── */
+.pp-spinner {
+    width: 3.5rem;
+    height: 3.5rem;
+    border: 3px solid #1c1c1c;
+    border-top-color: var(--sz-red);
+    border-radius: 50%;
+    animation: pp-spin 0.9s linear infinite;
+}
+
+@keyframes pp-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Labels ──────────────────────────────────────── */
+.pp-label {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--sz-white);
+    line-height: 1;
+}
+
+.pp-sub {
+    font-size: 0.8rem;
+    color: #444;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.pp-check {
+    font-size: 3.5rem;
+    color: var(--sz-red);
+    font-weight: 900;
+    line-height: 1;
+}
+
+.pp-error-label {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--sz-red);
+    line-height: 1;
+}
+
+/* ── Download button ─────────────────────────────── */
+.pp-download {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: var(--sz-red);
+    color: var(--sz-white);
+    font-family: var(--sz-font-display);
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.pp-download:hover {
+    background: #ff2200;
+}
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 600px) {
+    .pp-canvas {
+        padding: 4rem 1.25rem 3rem;
+    }
+
+    .pp-corner {
+        padding: 0.85rem 1.25rem;
+    }
+
+    .pp-corner-num {
+        font-size: 1.75rem;
+    }
+}
