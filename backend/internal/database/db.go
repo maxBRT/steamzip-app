@@ -17,13 +17,8 @@ func Connect() *gorm.DB {
 		log.Fatal("DATABASE_URL environment variable is not set")
 	}
 
-	logLevel := logger.Info
-	if os.Getenv("APP_ENV") == "production" {
-		logLevel = logger.Warn
-	}
-
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logLevel),
+		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)

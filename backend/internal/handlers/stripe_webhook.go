@@ -64,15 +64,14 @@ func (h *Handler) HandleStripeWebhook(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Mark session as paid
+		// Mark session as paid (idempotent)
 		if err := h.Database.Model(&session).Update("status", models.SessionStatusPaid).Error; err != nil {
 			log.Printf("failed to mark session %s as paid: %v", sessionIDStr, err)
 			http.Error(w, "Internal error", http.StatusInternalServerError)
 			return
 		}
 
-		// Load the asset with a direct query — avoids GORM has-one preload
-		// silently returning nil when Limit is applied to the association query.
+		// Load the asset with a direct query
 		var asset models.Asset
 		if err := h.Database.Where("session_id = ?", sessionID).Order("created_at DESC").First(&asset).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -86,6 +85,13 @@ func (h *Handler) HandleStripeWebhook(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		session.Asset = &asset
+
+		// Skip if already successfully processed
+		if asset.Status == models.AssetStatusReady {
+			log.Printf("asset %s already processed; skipping", asset.ID)
+			w.WriteHeader(http.StatusOK)
+			return
+		}
 
 		if session.Asset.FocalPoints == nil {
 			log.Printf("asset %s has no focal points stored; marking failed", session.Asset.ID)
@@ -104,14 +110,22 @@ func (h *Handler) HandleStripeWebhook(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Mark asset as processing and kick off the job
+		// Mark asset as processing
 		if err := h.Database.Model(session.Asset).Update("status", models.AssetStatusProcessing).Error; err != nil {
 			log.Printf("failed to set asset %s to processing: %v", session.Asset.ID, err)
 			http.Error(w, "Internal error", http.StatusInternalServerError)
 			return
 		}
 
-		go h.runProcessingJob(*session.Asset, fp.ToMap())
+		// Run synchronously so Stripe retries on failure (non-200)
+		h.runProcessingJob(*session.Asset, fp.ToMap())
+
+		// Verify it succeeded
+		if err := h.Database.First(&asset, asset.ID).Error; err == nil && asset.Status != models.AssetStatusReady {
+			log.Printf("processing job did not complete for asset %s", asset.ID)
+			http.Error(w, "Processing failed", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)
