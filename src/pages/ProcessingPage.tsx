@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { SiteHeader } from '../components/sections/SiteHeader';
 import { api } from '../lib/api';
 import './ProcessingPage.css';
@@ -7,8 +6,7 @@ import './ProcessingPage.css';
 type PageState = 'processing' | 'ready' | 'error';
 
 export default function ProcessingPage(): React.ReactElement {
-    const [searchParams] = useSearchParams();
-    const sessionId = searchParams.get('session');
+    const sessionId = localStorage.getItem('sz_session_id');
 
     const [pageState, setPageState] = useState<PageState>('processing');
     const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
@@ -17,7 +15,7 @@ export default function ProcessingPage(): React.ReactElement {
 
     useEffect(() => {
         if (!sessionId) {
-            setErrorMsg('No session ID in URL.');
+            setErrorMsg('No active session found.');
             setPageState('error');
             return;
         }

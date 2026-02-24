@@ -6,6 +6,7 @@
     text-transform: uppercase;
     padding: 1.25rem 2.5rem 1.25rem 0;
     border-right: var(--sz-border);
+    cursor: pointer;
 }
 
 .d5-logo span {

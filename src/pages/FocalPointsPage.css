@@ -240,6 +240,26 @@
     line-height: 1;
 }
 
+/* ── Change image ────────────────────────────────── */
+.fp-change-image {
+    align-self: flex-start;
+    background: transparent;
+    border: none;
+    color: #333;
+    font-family: var(--sz-font-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 0.25rem 0;
+    transition: color 0.15s ease;
+}
+
+.fp-change-image:hover {
+    color: #666;
+}
+
 /* ── Error ───────────────────────────────────────── */
 .fp-error {
     font-size: 0.8rem;

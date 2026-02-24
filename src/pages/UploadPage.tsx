@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SiteHeader } from '../components/sections/SiteHeader';
 import { DropZone } from '../components/ui/DropZone';
 import { useSession } from '../hooks/useSession';
@@ -11,6 +11,8 @@ export default function UploadPage(): React.ReactElement {
     const { upload, status: uploadStatus, error: uploadError } = useFileUpload(session.sessionId);
     const [file, setFile] = useState<File | null>(null);
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const isReupload = searchParams.get('reupload') === 'true';
 
     const isLoading = session.status === 'loading';
     const isUploading = uploadStatus === 'uploading';
@@ -22,6 +24,16 @@ export default function UploadPage(): React.ReactElement {
             navigate('/focal-points');
         }
     }, [uploadStatus, navigate]);
+
+    useEffect(() => {
+        if (session.status !== 'ready' || !session.resumeState) return;
+        const { paymentStatus, assetStatus } = session.resumeState;
+        if (paymentStatus === 'paid') {
+            navigate(`/processing?session=${session.sessionId}`, { replace: true });
+        } else if (assetStatus === 'uploaded' && !isReupload) {
+            navigate('/focal-points', { replace: true });
+        }
+    }, [session.status, session.resumeState, session.sessionId, navigate, isReupload]);
 
     function handleSubmit(e: React.SubmitEvent<HTMLFormElement>): void {
         e.preventDefault();

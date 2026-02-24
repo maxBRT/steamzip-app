@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { SiteHeader } from '../components/sections/SiteHeader';
 import { ImageCropper } from '../components/ui/ImageCropper';
 import { useSession } from '../hooks/useSession';
@@ -11,6 +12,14 @@ export default function FocalPointsPage(): React.ReactElement {
     const session = useSession();
     const fp = useFocalPoints(session.sessionId);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (session.status !== 'ready' || !session.resumeState) return;
+        if (session.resumeState.paymentStatus === 'paid') {
+            navigate('/processing', { replace: true });
+        }
+    }, [session.status, session.resumeState, session.sessionId, navigate]);
 
     useEffect(() => {
         if (!session.sessionId) return;
@@ -123,6 +132,13 @@ export default function FocalPointsPage(): React.ReactElement {
                         {fp.submitError && (
                             <div className="fp-error">{fp.submitError}</div>
                         )}
+
+                        <button
+                            className="fp-change-image"
+                            onClick={() => navigate('/upload?reupload=true')}
+                        >
+                            ← CHANGE IMAGE
+                        </button>
                     </div>
                 )}
             </div>

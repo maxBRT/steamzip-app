@@ -14,10 +14,10 @@ import (
 	"github.com/maxbrt/steamzip-app/internal/utils"
 )
 
-//go:embed ../../docs/docs.html
+//go:embed docs/docs.html
 var docsHTML []byte
 
-//go:embed ../../docs/api.json
+//go:embed docs/api.json
 var docsJSON []byte
 
 type Server struct {
