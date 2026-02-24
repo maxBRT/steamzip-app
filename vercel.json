@@ -1,6 +1,6 @@
 {
   "installCommand": "bun install",
-  "buildCommand": "bun build ./src/index.html --outdir=dist",
+  "buildCommand": "bun build ./src/index.html --outdir=dist --env=inline",
   "outputDirectory": "dist",
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
