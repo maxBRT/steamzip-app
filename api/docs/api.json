@@ -1,0 +1,330 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Steam Store Asset Processor",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/sessions": {
+            "post": {
+                "summary": "Initialize a new anonymous session",
+                "operationId": "createSession",
+                "responses": {
+                    "201": {
+                        "description": "Session created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Session"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sessions/{sessionId}/status": {
+            "get": {
+                "summary": "Get current progress and download link",
+                "operationId": "getSessionStatus",
+                "parameters": [
+                    {
+                        "name": "sessionId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SessionStatusResponse"
+                                }
+                            }
+                        }
+                    },
+                    "410": {
+                        "description": "Session expired"
+                    }
+                }
+            }
+        },
+        "/api/sessions/{sessionId}/assets/upload-url": {
+            "post": {
+                "summary": "Request a presigned S3 URL to upload the master image",
+                "operationId": "getMasterUploadUrl",
+                "parameters": [
+                    {
+                        "name": "sessionId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Metadata about the file to be uploaded",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "contentType"
+                                ],
+                                "properties": {
+                                    "contentType": {
+                                        "type": "string",
+                                        "example": "image/png"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Presigned URL generated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "assetId": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "uploadUrl": {
+                                            "type": "string",
+                                            "format": "uri",
+                                            "description": "Use this URL with a PUT request to upload your file directly to S3."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sessions/{sessionId}/assets/confirm-upload": {
+            "post": {
+                "summary": "Confirm that the master image upload to S3 has completed",
+                "operationId": "confirmUpload",
+                "parameters": [
+                    {
+                        "name": "sessionId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Upload confirmed, asset status set to uploaded"
+                    },
+                    "404": {
+                        "description": "Session not found"
+                    },
+                    "409": {
+                        "description": "Asset is not in uploading state, or file not found in storage"
+                    }
+                }
+            }
+        },
+        "/api/sessions/{sessionId}/assets/process": {
+            "post": {
+                "summary": "Submit focal points and trigger the generation of all Steam assets",
+                "operationId": "triggerProcessing",
+                "parameters": [
+                    {
+                        "name": "sessionId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProcessingRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Processing started asynchronously",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "estimatedTimeSeconds": {
+                                            "type": "integer",
+                                            "example": 30
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Session not found"
+                    },
+                    "409": {
+                        "description": "Asset is not ready for processing"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Session": {
+                "type": "object",
+                "properties": {
+                    "session_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "payment_pending"
+                    }
+                }
+            },
+            "SessionStatusResponse": {
+                "type": "object",
+                "properties": {
+                    "sessionId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "paid"
+                    },
+                    "downloadUrl": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Only provided if session status is 'paid'"
+                    }
+                }
+            },
+            "ProcessingRequest": {
+                "type": "object",
+                "required": [
+                    "focalPoints"
+                ],
+                "properties": {
+                    "focalPoints": {
+                        "$ref": "#/components/schemas/SteamAssetFocalPoints"
+                    }
+                }
+            },
+            "SteamAssetFocalPoints": {
+                "type": "object",
+                "description": "X, Y coordinates (0.0–1.0) and zoom factor (default 1.0) for each crop type",
+                "properties": {
+                    "header_capsule": {
+                        "$ref": "#/components/schemas/Point",
+                        "description": "920x430"
+                    },
+                    "small_capsule": {
+                        "$ref": "#/components/schemas/Point",
+                        "description": "462x174"
+                    },
+                    "main_capsule": {
+                        "$ref": "#/components/schemas/Point",
+                        "description": "1232x706"
+                    },
+                    "vertical_capsule": {
+                        "$ref": "#/components/schemas/Point",
+                        "description": "748x896"
+                    },
+                    "screenshots": {
+                        "$ref": "#/components/schemas/Point",
+                        "description": "1920x1080+"
+                    },
+                    "page_background": {
+                        "$ref": "#/components/schemas/Point",
+                        "description": "1438x810 (Optional)"
+                    },
+                    "shortcut_icon": {
+                        "$ref": "#/components/schemas/Point",
+                        "description": "256x256"
+                    },
+                    "app_icon": {
+                        "$ref": "#/components/schemas/Point",
+                        "description": "184x184"
+                    },
+                    "library_capsule": {
+                        "$ref": "#/components/schemas/Point",
+                        "description": "600x900"
+                    },
+                    "library_hero": {
+                        "$ref": "#/components/schemas/Point",
+                        "description": "3840x1240"
+                    },
+                    "library_logo": {
+                        "$ref": "#/components/schemas/Point",
+                        "description": "1280x720"
+                    },
+                    "library_header_capsule": {
+                        "$ref": "#/components/schemas/Point",
+                        "description": "920x430"
+                    },
+                    "event_cover": {
+                        "$ref": "#/components/schemas/Point",
+                        "description": "800x450"
+                    },
+                    "event_header": {
+                        "$ref": "#/components/schemas/Point",
+                        "description": "1920x622 (Optional)"
+                    }
+                }
+            },
+            "Point": {
+                "type": "object",
+                "properties": {
+                    "x": {
+                        "type": "number",
+                        "description": "Horizontal focal point, 0.0 (left) to 1.0 (right)",
+                        "example": 0.5
+                    },
+                    "y": {
+                        "type": "number",
+                        "description": "Vertical focal point, 0.0 (top) to 1.0 (bottom)",
+                        "example": 0.5
+                    },
+                    "zoom": {
+                        "type": "number",
+                        "description": "Zoom factor. 1.0 = default (largest crop fitting the aspect ratio). Values > 1 zoom in (e.g. 2.0 = 2× zoom, crops half the area).",
+                        "example": 1.0
+                    }
+                }
+            }
+        }
+    },
+    "servers": [
+        {
+            "description": "SwaggerHub API Auto Mocking",
+            "url": "https://virtserver.swaggerhub.com/maxbrt/SteamzipImageProcessing/1.0.0"
+        }
+    ]
+}

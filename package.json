@@ -4,7 +4,8 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "bun --hot ./index.ts"
+        "dev": "bun --hot ./index.ts",
+        "build": "bun build ./src/index.html --outdir=dist"
     },
     "dependencies": {
         "react": "^19",
@@ -12,10 +13,8 @@
         "react-router-dom": "^7.13.0"
     },
     "devDependencies": {
-        "@cloudflare/workers-types": "^4.20260218.0",
         "@types/bun": "latest",
         "@types/react": "^19",
-        "@types/react-dom": "^19",
-        "wrangler": "^4.66.0"
+        "@types/react-dom": "^19"
     }
 }
