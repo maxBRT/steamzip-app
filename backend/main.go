@@ -34,7 +34,7 @@ func main() {
 	h := handlers.NewHandler(db, s3Client, bucket, stripeSecretKey, stripeWebhookSecret, frontendURL)
 	s.MountHandlers(h)
 
-	port := utils.GetEnv("PORT", "8080")
+	port := utils.GetEnv("PORT", "3000")
 	log.Printf("Starting server on :%s", port)
 	if err := http.ListenAndServe(":"+port, s.Router); err != nil {
 		log.Fatalf("Server failed: %v", err)

@@ -1,4 +1,4 @@
-const BASE = import.meta.env?.BUN_PUBLIC_API_URL ?? '';
+const BASE = process.env.BUN_PUBLIC_API_URL ?? '';
 
 export class ApiError extends Error {
     constructor(public status: number, message: string) {
