@@ -13,6 +13,7 @@ require (
 	github.com/go-chi/cors v1.2.2
 	github.com/go-chi/httprate v0.15.0
 	github.com/google/uuid v1.6.0
+	github.com/joho/godotenv v1.5.1
 	github.com/stripe/stripe-go/v84 v84.3.0
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.1

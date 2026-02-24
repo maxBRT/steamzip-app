@@ -7,6 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/joho/godotenv"
 	"github.com/maxbrt/steamzip-app/internal/database"
 	"github.com/maxbrt/steamzip-app/internal/handlers"
 	"github.com/maxbrt/steamzip-app/internal/server"
@@ -14,6 +15,14 @@ import (
 )
 
 func main() {
+	env := utils.GetEnv("APP_ENV", "development")
+	if env == "development" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatalf("Failed to load .env file: %v", err)
+		}
+	}
+
 	db := database.Connect()
 	if err := database.AutoMigrate(db); err != nil {
 		log.Fatalf("Auto-migration failed: %v", err)

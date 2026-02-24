@@ -67,8 +67,9 @@ func (h *Handler) HandleCreateCheckout(w http.ResponseWriter, r *http.Request) {
 				Quantity: stripe.Int64(1),
 			},
 		},
-		SuccessURL: stripe.String(h.FrontendURL + "/processing"),
-		CancelURL:  stripe.String(h.FrontendURL + "/focal-points"),
+		AllowPromotionCodes: stripe.Bool(true),
+		SuccessURL:          stripe.String(h.FrontendURL + "/processing"),
+		CancelURL:           stripe.String(h.FrontendURL + "/focal-points"),
 		Metadata: map[string]string{
 			"session_id": session.ID.String(),
 		},
