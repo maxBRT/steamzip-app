@@ -100,17 +100,23 @@ export function ImageCropper({ imageUrl, asset, point, zoom, onChange, onZoomCha
         dragOffset.current = null;
     }
 
-    function handleWheel(e: React.WheelEvent<HTMLDivElement>) {
-        e.preventDefault();
-        const direction = e.deltaY > 0 ? 1 : -1;
-        const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom + direction * ZOOM_STEP));
-        onZoomChange(Math.round(newZoom / ZOOM_STEP) * ZOOM_STEP);
-    }
+    useEffect(() => {
+        const el = containerRef.current;
+        if (!el) return;
+        function onWheel(e: WheelEvent) {
+            e.preventDefault();
+            const direction = e.deltaY > 0 ? 1 : -1;
+            const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom + direction * ZOOM_STEP));
+            onZoomChange(Math.round(newZoom / ZOOM_STEP) * ZOOM_STEP);
+        }
+        el.addEventListener('wheel', onWheel, { passive: false });
+        return () => el.removeEventListener('wheel', onWheel);
+    }, [zoom, onZoomChange]);
 
     const ready = imgW > 0 && rectW > 0;
 
     return (
-        <div className="ic-container" ref={containerRef} onWheel={handleWheel}>
+        <div className="ic-container" ref={containerRef}>
             <img
                 className="ic-image"
                 src={imageUrl}
